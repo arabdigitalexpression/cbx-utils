@@ -21,11 +21,15 @@ shift $((OPTIND-1))
 [ "${1:-}" = "--" ] && shift
 cbxFileName=$1
 
-mime=$(file -ib $cbxFileName)
+mime=$(file -ib "$cbxFileName")
 case "$mime" in
+  application/zip*)
+    pageFileName=$(zipinfo -1 "$cbxFileName" |sort |head -n $pageNumber | tail -n 1)
+    unzip  "$cbxFileName" $pageFileName 
+    ;;
   application/x-rar*)
-    pageFileName=$(unrar lb $cbxFileName | head -n $pageNumber | tail -n 1)
-    unrar p $cbxFileName $pageFileName -idq
+    pageFileName=$(unrar lb "$cbxFileName" | head -n $pageNumber | tail -n 1)
+    unrar p "$cbxFileName" $pageFileName -idq
     ;;
   *)
     echo unexpected mime $mime
